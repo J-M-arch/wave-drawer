@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Wave Drawer - Draw and hear custom waveforms with Web Audio API">
+    <title>Wave Drawer - Draw & Hear Your Waveform</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!--
+        Wave Drawer Application
+        =======================
+        A web-based waveform editor that lets users:
+        - Draw custom waveforms using control points
+        - Hear their waveforms as sound via Web Audio API
+        - Use preset waveforms (sine, triangle, sawtooth, square)
+        - Adjust frequency in real-time
+    -->
+    
+    <div class="container">
+        <header>
+            <h1>Wave Drawer</h1>
+            <p class="instructions">Click anywhere to adjust the nearest point. Drag vertically to shape your waveform, change Points for a lower or higher resolution, then click Play to hear it.</p>
+        </header>
+        
+        <!-- Primary Controls -->
+        <div class="controls">
+            <button id="playPauseBtn" class="btn btn-primary">Play</button>
+            <button id="clearBtn" class="btn btn-secondary">Reset Waveform</button>
+            <div class="points-control">
+                <label for="pointCount">Points:</label>
+                <select id="pointCount">
+                    <option value="8">8</option>
+                    <option value="16">16</option>
+                    <option value="32">32</option>
+                    <option value="64">64</option>
+                    <option value="128">128</option>
+                    <option value="256" selected>256</option>
+                    <option value="512">512</option>
+                    <option value="1024">1024</option>
+                </select>
+                <span id="pointCountValue">256 points</span>
+            </div>
+            <div class="freq-control">
+                <label for="frequency">Frequency:</label>
+                <input type="range" id="frequency" min="20" max="2000" step="10" value="440">
+                <span id="frequencyValue">440Hz</span>
+            </div>
+        </div>
+        
+        <!-- Presets Section -->
+        <div class="presets">
+            <span class="presets-label">Presets:</span>
+            <button class="preset-btn" data-preset="sine">Sine</button>
+            <button class="preset-btn" data-preset="triangle">Triangle</button>
+            <button class="preset-btn" data-preset="sawtooth">Sawtooth</button>
+            <button class="preset-btn" data-preset="square">Square</button>
+        </div>
+        
+        <!-- Main Canvas -->
+        <canvas id="waveCanvas" width="800" height="400"></canvas>
+        
+        <!-- Status Display -->
+        <div class="status" id="status">Ready to edit!</div>
+    </div>
+    
+    <script type="module" src="script.js"></script>
+</body>
+</html>
