@@ -10,7 +10,7 @@ const frequencySlider = document.getElementById('frequency');
 const frequencyValue = document.getElementById('frequencyValue');
 const status = document.getElementById('status');
 const POINT_OPTIONS = [8, 16, 32, 64, 128, 256, 512, 1024];
-const DEFAULT_POINTS = 256;
+const DEFAULT_POINTS = 64;
 const WIDTH = canvas.width;
 const HEIGHT = canvas.height;
 const CENTER = HEIGHT / 2;
@@ -198,8 +198,8 @@ function setup() {
 function init() {
     pointCountSelect.value = String(DEFAULT_POINTS);
     initPoints();
-    commitPoints();
     audio = createAudioController({ getAmplitudeAtX, getFrequency: () => Number.parseFloat(frequencySlider.value), onStatus: updateStatus });
+    applyPreset('sine');
     pointCountValue.textContent = `${DEFAULT_POINTS} points`;
     setup(); draw();
 }
