@@ -1,8 +1,20 @@
+// Web Audio engine. Owns AudioContext, gain, oscillator and PeriodicWave.
+// Deliberately independent of the DOM: it receives waveform data through
+// injected callbacks ({ getAmplitudeAtX, getFrequency, onStatus }) so any
+// future module can feed it without knowing it exists.
+//
+// Audio pipeline (do not regress):
+//   samples -> discrete Fourier transform -> peak-normalized harmonics ->
+//   createPeriodicWave -> oscillator. PeriodicWave expects FOURIER
+//   coefficients, never raw time-domain samples in the `real` array.
+// The one-shot buffer path is only a fallback when createPeriodicWave is
+// unavailable or rejects the coefficients.
+
 const AUDIO_SAMPLE_COUNT = 2048;
 const AUDIO_HARMONIC_COUNT = 128;
 const AUDIO_GAIN = 0.5;
 
-export function createAudioController({ getAmplitudeAtX, getFrequency, onStatus }) {
+export function createAudioEngine({ getAmplitudeAtX, getFrequency, onStatus }) {
     let audioContext = null;
     let oscillator = null;
     let gainNode = null;
@@ -26,6 +38,14 @@ export function createAudioController({ getAmplitudeAtX, getFrequency, onStatus 
             oscillator = null;
         }
         isPlaying = false;
+    }
+
+    function sampleWaveform(sampleCount) {
+        const samples = new Float32Array(sampleCount);
+        for (let i = 0; i < sampleCount; i++) {
+            samples[i] = getAmplitudeAtX(i / sampleCount);
+        }
+        return samples;
     }
 
     function createPeriodicWaveData() {
@@ -68,12 +88,24 @@ export function createAudioController({ getAmplitudeAtX, getFrequency, onStatus 
         return { real, imag };
     }
 
-    function sampleWaveform(sampleCount) {
-        const samples = new Float32Array(sampleCount);
-        for (let i = 0; i < sampleCount; i++) {
-            samples[i] = getAmplitudeAtX(i / sampleCount);
-        }
-        return samples;
+    function playOneShot() {
+        const duration = 1.0;
+        const sampleRate = audioContext.sampleRate;
+        const numSamples = Math.floor(sampleRate * duration);
+        const waveformData = sampleWaveform(numSamples);
+        const buffer = audioContext.createBuffer(1, numSamples, sampleRate);
+        buffer.getChannelData(0).set(waveformData);
+
+        const source = audioContext.createBufferSource();
+        source.buffer = buffer;
+        source.connect(gainNode);
+        source.onended = () => {
+            isPlaying = false;
+            onStatus('Playback complete!');
+        };
+        source.start();
+        isPlaying = true;
+        onStatus('Playing one-shot waveform...');
     }
 
     function play() {
@@ -99,26 +131,6 @@ export function createAudioController({ getAmplitudeAtX, getFrequency, onStatus 
         onStatus(`Playing at ${frequency}Hz`);
     }
 
-    function playOneShot() {
-        const duration = 1.0;
-        const sampleRate = audioContext.sampleRate;
-        const numSamples = Math.floor(sampleRate * duration);
-        const waveformData = sampleWaveform(numSamples);
-        const buffer = audioContext.createBuffer(1, numSamples, sampleRate);
-        buffer.getChannelData(0).set(waveformData);
-
-        const source = audioContext.createBufferSource();
-        source.buffer = buffer;
-        source.connect(gainNode);
-        source.onended = () => {
-            isPlaying = false;
-            onStatus('Playback complete!');
-        };
-        source.start();
-        isPlaying = true;
-        onStatus('Playing one-shot waveform...');
-    }
-
     return {
         get isPlaying() {
             return isPlaying;
@@ -128,6 +140,6 @@ export function createAudioController({ getAmplitudeAtX, getFrequency, onStatus 
             stop();
             onStatus('Paused. Click Play to resume.');
         },
-        stop
+        stop,
     };
 }

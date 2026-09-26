@@ -63,8 +63,27 @@
         
         <!-- Status Display -->
         <div class="status" id="status">Ready to edit!</div>
+
+        <!--
+            FUTURE PAGE MODULES
+            ===================
+            New sections extend the page BELOW this point, one sibling per
+            module. Each module follows the pattern in src/modules/:
+              - markup: a <section class="module" id="<name>-module"> here
+              - logic:  src/modules/<name>Module.js exporting
+                        create<Name>Module({ bus, dom, ... }) -> { mount, unmount }
+              - events: names/payloads registered in src/core/eventsRegistry.js
+              - wiring: instantiated + appended to `modules` in src/app.js
+              - ids:    added to the registry list in src/ui/dom.js
+            Example skeleton (uncomment when implementing):
+
+            <section class="module" id="example-module">
+                <h2>Example Module</h2>
+                <div id="exampleControls"></div>
+            </section>
+        -->
     </div>
     
-    <script type="module" src="script.js"></script>
+    <script type="module" src="src/main.js"></script>
 </body>
 </html>

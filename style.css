@@ -110,6 +110,22 @@ button:hover {
     color: #ff4757; 
     text-shadow: 0 0 5px rgba(255, 71, 87, 0.5);
 }
+/* Page-module sections (see index.html "FUTURE PAGE MODULES" comment).
+   Every new section below the canvas should use <section class="module">. */
+.module {
+    margin-top: 20px;
+    background: rgba(0, 180, 219, 0.03);
+    border: 1px solid rgba(0, 180, 219, 0.2);
+    border-radius: 8px;
+    padding: 16px;
+}
+.module h2 {
+    font-size: 1.2em;
+    color: #00b4db;
+    margin: 0 0 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
 .presets { 
     margin-bottom: 20px; 
     background: rgba(0, 180, 219, 0.03);
